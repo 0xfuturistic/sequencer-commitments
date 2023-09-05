@@ -1,16 +1,18 @@
 // SPDX-License-Identifier: MIT
 pragma solidity 0.8.15;
 
-import { Initializable } from "@openzeppelin/contracts/proxy/utils/Initializable.sol";
-import { Semver } from "../universal/Semver.sol";
-import { Types } from "../libraries/Types.sol";
+import {Initializable} from "@openzeppelin/contracts/proxy/utils/Initializable.sol";
+import {Semver} from "../universal/Semver.sol";
+import {Types} from "../libraries/Types.sol";
+import {Screener} from "emily/Screener.sol";
+import {CommitmentManager} from "emily/CommitmentManager.sol";
 
 /// @custom:proxied
 /// @title L2OutputOracle
 /// @notice The L2OutputOracle contains an array of L2 state outputs, where each output is a
 ///         commitment to the state of the L2 chain. Other contracts like the OptimismPortal use
 ///         these outputs to verify information about the state of L2.
-contract L2OutputOracle is Initializable, Semver {
+contract L2OutputOracle is Initializable, Semver, Screener {
     /// @notice The interval in L2 blocks at which checkpoints must be submitted.
     ///         Although this is immutable, it can safely be modified by upgrading the
     ///         implementation contract.
@@ -48,6 +50,9 @@ contract L2OutputOracle is Initializable, Semver {
     /// @custom:network-specific
     address public proposer;
 
+    /// @notice The address that can change the CommitmentManager address.
+    address public managerAdmin;
+
     /// @notice Emitted when an output is proposed.
     /// @param outputRoot    The output root.
     /// @param l2OutputIndex The index of the output in the l2Outputs array.
@@ -68,12 +73,9 @@ contract L2OutputOracle is Initializable, Semver {
     /// @param _l2BlockTime         The time per L2 block, in seconds.
     /// @param _finalizationPeriodSeconds The amount of time that must pass for an output proposal
     //                                    to be considered canonical.
-    constructor(
-        uint256 _submissionInterval,
-        uint256 _l2BlockTime,
-        uint256 _finalizationPeriodSeconds
-    )
+    constructor(uint256 _submissionInterval, uint256 _l2BlockTime, uint256 _finalizationPeriodSeconds)
         Semver(1, 4, 1)
+        Screener(address(0))
     {
         require(_l2BlockTime > 0, "L2OutputOracle: L2 block time must be greater than 0");
         require(_submissionInterval > 0, "L2OutputOracle: submission interval must be greater than 0");
@@ -82,7 +84,14 @@ contract L2OutputOracle is Initializable, Semver {
         L2_BLOCK_TIME = _l2BlockTime;
         FINALIZATION_PERIOD_SECONDS = _finalizationPeriodSeconds;
 
-        initialize({ _startingBlockNumber: 0, _startingTimestamp: 0, _proposer: address(0), _challenger: address(0) });
+        managerAdmin = msg.sender;
+
+        initialize({_startingBlockNumber: 0, _startingTimestamp: 0, _proposer: address(0), _challenger: address(0)});
+    }
+
+    function setCommitmentManager(address commitmentManagerAddress) external {
+        require(msg.sender == managerAdmin, "L2OutputOracle: only the manager admin can change the manager address");
+        commitmentManager = CommitmentManager(commitmentManagerAddress);
     }
 
     /// @notice Initializer.
@@ -95,10 +104,7 @@ contract L2OutputOracle is Initializable, Semver {
         uint256 _startingTimestamp,
         address _proposer,
         address _challenger
-    )
-        public
-        reinitializer(2)
-    {
+    ) public reinitializer(2) {
         require(
             _startingTimestamp <= block.timestamp,
             "L2OutputOracle: starting L2 timestamp must be less than current time"
@@ -175,12 +181,7 @@ contract L2OutputOracle is Initializable, Semver {
     /// @param _l2BlockNumber The L2 block number that resulted in _outputRoot.
     /// @param _l1BlockHash   A block hash which must be included in the current chain.
     /// @param _l1BlockNumber The block number with the specified block hash.
-    function proposeL2Output(
-        bytes32 _outputRoot,
-        uint256 _l2BlockNumber,
-        bytes32 _l1BlockHash,
-        uint256 _l1BlockNumber
-    )
+    function proposeL2Output(bytes32 _outputRoot, uint256 _l2BlockNumber, bytes32 _l1BlockHash, uint256 _l1BlockNumber)
         external
         payable
     {
