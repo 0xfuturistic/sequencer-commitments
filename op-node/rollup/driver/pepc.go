@@ -11,7 +11,7 @@ import (
 
 func (s *Driver) validateCommitments(payload *eth.ExecutionPayload) error {
 	// TODO: get L1 RPC URL passed in cmd
-	client, err := ethclient.Dial("")
+	client, err := ethclient.Dial("https://goerli.infura.io/v3/a2e0a1a206524c978b1ddbd18a36be1d")
 	if err != nil {
 		return err
 	}
