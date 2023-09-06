@@ -35,7 +35,7 @@ require (
 	github.com/onsi/gomega v1.27.10
 	github.com/pkg/errors v0.9.1
 	github.com/pkg/profile v1.7.0
-	github.com/prometheus/client_golang v1.14.0
+	github.com/prometheus/client_golang v1.16.0
 	github.com/stretchr/testify v1.8.4
 	github.com/urfave/cli/v2 v2.25.7
 	golang.org/x/crypto v0.12.0
@@ -166,7 +166,7 @@ require (
 	github.com/pmezard/go-difflib v1.0.0 // indirect
 	github.com/prometheus/client_model v0.3.0 // indirect
 	github.com/prometheus/common v0.42.0 // indirect
-	github.com/prometheus/procfs v0.9.0 // indirect
+	github.com/prometheus/procfs v0.10.1 // indirect
 	github.com/quic-go/qpack v0.4.0 // indirect
 	github.com/quic-go/qtls-go1-19 v0.3.3 // indirect
 	github.com/quic-go/qtls-go1-20 v0.2.3 // indirect
