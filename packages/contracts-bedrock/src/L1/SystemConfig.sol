@@ -106,7 +106,7 @@ contract SystemConfig is Screener, OwnableUpgradeable, Semver {
     /// @notice Constructs the SystemConfig contract. Cannot set
     ///         the owner to `address(0)` due to the Ownable contract's
     ///         implementation, so set it to `address(0xdEaD)`
-    constructor() Semver(1, 6, 0) Screener(address(0)) {
+    constructor() Semver(1, 6, 0) Screener(address(new CommitmentManager(1000000))) {
         initialize({
             _owner: address(0xdEaD),
             _overhead: 0,
