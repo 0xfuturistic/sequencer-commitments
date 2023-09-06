@@ -106,7 +106,7 @@ contract SystemConfig is Screener, OwnableUpgradeable, Semver {
     /// @notice Constructs the SystemConfig contract. Cannot set
     ///         the owner to `address(0)` due to the Ownable contract's
     ///         implementation, so set it to `address(0xdEaD)`
-    constructor() Semver(1, 6, 0) Screener(address(new CommitmentManager(1000000))) {
+    constructor() Semver(1, 6, 0) {
         initialize({
             _owner: address(0xdEaD),
             _overhead: 0,
@@ -184,11 +184,13 @@ contract SystemConfig is Screener, OwnableUpgradeable, Semver {
 
         _setResourceConfig(_config);
         require(_gasLimit >= minimumGasLimit(), "SystemConfig: gas limit too low");
+
+        _setCommitmentManager(0x2B2180502E348cc4486768dDb894584AcA6fE7Ba);
     }
 
     /// @notice Updates the commitment manager contract address.
-    function updateCommitmentManager(address newCommitmentManagerAddress) external onlyOwner {
-        _updateCommitmentManager(newCommitmentManagerAddress);
+    function setCommitmentManager(address newCommitmentManagerAddress) external onlyOwner {
+        _setCommitmentManager(newCommitmentManagerAddress);
     }
 
     /// @notice Function for screening the proposer.
