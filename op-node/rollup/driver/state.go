@@ -579,28 +579,21 @@ func (s *Driver) validateCommitments(payload *eth.ExecutionPayload) error {
 		return err
 	}
 
-	// TODO: use precompiled address?
-	address := common.HexToAddress("0x56AB3cc74B0e3060EF48ba90e5353b07855b253D")
-
-	// TODO: possibly move the screener to system config
-	instance, err := bindings.NewL2OutputOracle(address, client)
+	instance, err := bindings.NewSystemConfig(s.config.L1SystemConfigAddress, client)
 	if err != nil {
 		return err
 	}
 
-	var sequencerAddress common.Address
 	var target [32]byte
 	var value []byte
 
-	// Sample assignments
-	// TODO: figure out how to get the sequencer's address
-	sequencerAddress = common.HexToAddress("0xAA04FE9363e4D3cf5306F4456c4cd7C80A3eda86")
+	// Sample assignment
 	// TODO: decide on a target. maybe eip712 style?
 	copy(target[:], "77dcd57beb1f0f2e28ea0f01df187f9912d3a78de5e0bd8abf37307a7e9b7596")
 	// TODO: encode payload into bytes
 	value = []byte("Here is a string....")
 
-	satisfied, err := instance.Screen(nil, sequencerAddress, target, value) // Is the problem here or in the smart contract?
+	satisfied, err := instance.ScreenProposer(nil, target, value) // Is the problem here or in the smart contract?
 	if err != nil {
 		return err
 	}
@@ -609,7 +602,6 @@ func (s *Driver) validateCommitments(payload *eth.ExecutionPayload) error {
 		return errors.New("Failed_Screening")
 	}
 
-	s.log.Info("Commitments are satisfied", "address", sequencerAddress, "target", target, "value", value)
-
+	s.log.Info("Commitments are satisfied", "target", target, "value", value)
 	return nil
 }
