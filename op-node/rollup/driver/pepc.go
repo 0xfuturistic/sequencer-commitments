@@ -9,6 +9,9 @@ import (
 	"github.com/ethereum-optimism/optimism/op-service/eth"
 )
 
+// validateCommitments validates that the proposer's commitments are satisfied for the given payload.
+// It does this by passing the payload to the L1 SystemConfig contracts, which checks the commitments.
+// It returns an error if the commitments are not satisfied.
 func (s *Driver) validateCommitments(payload *eth.ExecutionPayload) error {
 	// TODO: get L1 RPC URL passed in cmd
 	client, err := ethclient.Dial("")
