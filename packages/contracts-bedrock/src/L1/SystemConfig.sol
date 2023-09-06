@@ -1,15 +1,19 @@
 // SPDX-License-Identifier: MIT
 pragma solidity 0.8.15;
 
-import { OwnableUpgradeable } from "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
-import { Semver } from "../universal/Semver.sol";
-import { ResourceMetering } from "./ResourceMetering.sol";
+import {OwnableUpgradeable} from "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
+import {Semver} from "../universal/Semver.sol";
+import {ResourceMetering} from "./ResourceMetering.sol";
+
+import {L2OutputOracle} from "./L2OutputOracle.sol";
+import {CommitmentManager} from "emily/CommitmentManager.sol";
+import {Screener} from "emily/Screener.sol";
 
 /// @title SystemConfig
 /// @notice The SystemConfig contract is used to manage configuration of an Optimism network.
 ///         All configuration is stored on L1 and picked up by L2 as part of the derviation of
 ///         the L2 chain.
-contract SystemConfig is OwnableUpgradeable, Semver {
+contract SystemConfig is Screener, OwnableUpgradeable, Semver {
     /// @notice Enum representing different types of updates.
     /// @custom:value BATCHER              Represents an update to the batcher hash.
     /// @custom:value GAS_CONFIG           Represents an update to txn fee config on L2.
@@ -102,7 +106,7 @@ contract SystemConfig is OwnableUpgradeable, Semver {
     /// @notice Constructs the SystemConfig contract. Cannot set
     ///         the owner to `address(0)` due to the Ownable contract's
     ///         implementation, so set it to `address(0xdEaD)`
-    constructor() Semver(1, 6, 0) {
+    constructor() Semver(1, 6, 0) Screener(address(0)) {
         initialize({
             _owner: address(0xdEaD),
             _overhead: 0,
@@ -158,16 +162,13 @@ contract SystemConfig is OwnableUpgradeable, Semver {
         uint256 _startBlock,
         address _batchInbox,
         SystemConfig.Addresses memory _addresses
-    )
-        public
-        reinitializer(2)
-    {
+    ) public reinitializer(2) {
         __Ownable_init();
         transferOwnership(_owner);
 
         // These are set in ascending order of their UpdateTypes.
         _setBatcherHash(_batcherHash);
-        _setGasConfig({ _overhead: _overhead, _scalar: _scalar });
+        _setGasConfig({_overhead: _overhead, _scalar: _scalar});
         _setGasLimit(_gasLimit);
         _setUnsafeBlockSigner(_unsafeBlockSigner);
 
@@ -183,6 +184,17 @@ contract SystemConfig is OwnableUpgradeable, Semver {
 
         _setResourceConfig(_config);
         require(_gasLimit >= minimumGasLimit(), "SystemConfig: gas limit too low");
+    }
+
+    /// @notice Updates the commitment manager contract address.
+    function updateCommitmentManager(address newCommitmentManagerAddress) external onlyOwner {
+        _updateCommitmentManager(newCommitmentManagerAddress);
+    }
+
+    /// @notice Function for screening the proposer.
+    function screenProposer(bytes32 target, bytes memory value) external view returns (bool) {
+        address proposer = L2OutputOracle(this.l2OutputOracle()).proposer();
+        return screen(proposer, target, value);
     }
 
     /// @notice Returns the minimum L2 gas limit that can be safely set for the system to
