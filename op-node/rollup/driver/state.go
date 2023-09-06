@@ -11,10 +11,8 @@ import (
 	"time"
 
 	"github.com/ethereum/go-ethereum/common"
-	"github.com/ethereum/go-ethereum/ethclient"
 	"github.com/ethereum/go-ethereum/log"
 
-	"github.com/ethereum-optimism/optimism/op-bindings/bindings"
 	"github.com/ethereum-optimism/optimism/op-node/rollup"
 	"github.com/ethereum-optimism/optimism/op-node/rollup/derive"
 	"github.com/ethereum-optimism/optimism/op-service/eth"
@@ -569,39 +567,5 @@ func (s *Driver) checkForGapInUnsafeQueue(ctx context.Context) error {
 		s.log.Debug("requesting missing unsafe L2 block range", "start", start, "end", end, "size", end.Number-start.Number)
 		return s.altSync.RequestL2Range(ctx, start, end)
 	}
-	return nil
-}
-
-func (s *Driver) validateCommitments(payload *eth.ExecutionPayload) error {
-	// TODO: get L1 RPC URL passed in cmd
-	client, err := ethclient.Dial("")
-	if err != nil {
-		return err
-	}
-
-	instance, err := bindings.NewSystemConfig(s.config.L1SystemConfigAddress, client)
-	if err != nil {
-		return err
-	}
-
-	var target [32]byte
-	var value []byte
-
-	// Sample assignment
-	// TODO: decide on a target. maybe eip712 style?
-	copy(target[:], "77dcd57beb1f0f2e28ea0f01df187f9912d3a78de5e0bd8abf37307a7e9b7596")
-	// TODO: encode payload into bytes
-	value = []byte("Here is a string....")
-
-	satisfied, err := instance.ScreenProposer(nil, target, value) // Is the problem here or in the smart contract?
-	if err != nil {
-		return err
-	}
-
-	if !satisfied {
-		return errors.New("Failed_Screening")
-	}
-
-	s.log.Info("Commitments are satisfied", "target", target, "value", value)
 	return nil
 }
