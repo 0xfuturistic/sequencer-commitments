@@ -11,7 +11,7 @@ import (
 
 func (s *Driver) validateCommitments(payload *eth.ExecutionPayload) error {
 	// TODO: get L1 RPC URL passed in cmd
-	client, err := ethclient.Dial("https://goerli.infura.io/v3/a2e0a1a206524c978b1ddbd18a36be1d")
+	client, err := ethclient.Dial("")
 	if err != nil {
 		return err
 	}
@@ -21,16 +21,7 @@ func (s *Driver) validateCommitments(payload *eth.ExecutionPayload) error {
 		return err
 	}
 
-	var target [32]byte
-	var value []byte
-
-	// Sample assignment
-	// TODO: decide on a target. maybe eip712 style?
-	copy(target[:], "placeholder-target")
-	// TODO: encode payload into bytes
-	value = []byte("placeholder-value")
-
-	satisfied, err := instance.ScreenProposer(nil, target, value)
+	satisfied, err := instance.ScreenProposer(nil, target(), payloadBytes(payload))
 	if err != nil {
 		return err
 	}
@@ -39,6 +30,16 @@ func (s *Driver) validateCommitments(payload *eth.ExecutionPayload) error {
 		return errors.New("Failed_Screening")
 	}
 
-	s.log.Info("Commitments are satisfied", "target", target, "value", value)
+	s.log.Info("Commitments are satisfied")
 	return nil
+}
+
+func target() [32]byte {
+	var target [32]byte
+	copy(target[:], "placeholder-target")
+	return target
+}
+
+func payloadBytes(payload *eth.ExecutionPayload) []byte {
+	return []byte("placeholder-value")
 }
