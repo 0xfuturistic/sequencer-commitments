@@ -6,6 +6,9 @@ import (
 
 	"github.com/ethereum-optimism/optimism/op-bindings/bindings"
 	"github.com/ethereum-optimism/optimism/op-service/eth"
+	"github.com/ethereum/go-ethereum/accounts/abi"
+	"github.com/ethereum/go-ethereum/common"
+	"github.com/ethereum/go-ethereum/common/hexutil"
 )
 
 // validateCommitments validates that the proposer's commitments are satisfied for the given payload.
@@ -17,15 +20,22 @@ func (n *OpNode) validateCommitments(ctx context.Context, payload *eth.Execution
 		return err
 	}
 
-	satisfied, err := instance.Screen(nil, n.runCfg.P2PSequencerAddress(), target(), payloadBytes(payload))
+	// Encoding payload
+	payloadBytes, err := n.encodePayload(payload)
 	if err != nil {
 		return err
 	}
 
+	// Calling Screen function
+	satisfied, err := instance.Screen(nil, n.runCfg.P2PSequencerAddress(), target(), payloadBytes)
+	if err != nil {
+		return err
+	}
 	if !satisfied {
 		return errors.New("Failed_Screening")
 	}
 
+	// Satisfied
 	n.log.Info("Commitments are satisfied")
 	return nil
 }
@@ -36,6 +46,57 @@ func target() [32]byte {
 	return target
 }
 
-func payloadBytes(payload *eth.ExecutionPayload) []byte {
-	return []byte("placeholder-value")
+func (n *OpNode) encodePayload(payload *eth.ExecutionPayload) ([]byte, error) {
+	var (
+		structExecutionPayload, _ = abi.NewType("tuple", "struct ExecutionPayload", []abi.ArgumentMarshaling{
+			{Name: "ParentHash", Type: "bytes32"},
+			{Name: "FeeRecipient", Type: "address"},
+			{Name: "StateRoot", Type: "bytes32"},
+			{Name: "ReceiptsRoot", Type: "bytes32"},
+			{Name: "PrevRandao", Type: "bytes32"},
+			{Name: "BlockNumber", Type: "uint64"},
+			{Name: "GasLimit", Type: "uint64"},
+			{Name: "GasUsed", Type: "uint64"},
+			{Name: "Timestamp", Type: "uint64"},
+			{Name: "BlockHash", Type: "bytes32"},
+		})
+
+		args = abi.Arguments{
+			{Type: structExecutionPayload, Name: "param_one"},
+		}
+	)
+
+	_payload := struct {
+		ParentHash   common.Hash
+		FeeRecipient common.Address
+		StateRoot    [32]byte
+		ReceiptsRoot [32]byte
+		PrevRandao   [32]byte
+		BlockNumber  hexutil.Uint64
+		GasLimit     hexutil.Uint64
+		GasUsed      hexutil.Uint64
+		Timestamp    hexutil.Uint64
+		BlockHash    common.Hash
+	}{
+		payload.ParentHash,
+		payload.FeeRecipient,
+		payload.StateRoot,
+		payload.ReceiptsRoot,
+		payload.PrevRandao,
+		payload.BlockNumber,
+		payload.GasLimit,
+		payload.GasUsed,
+		payload.Timestamp,
+		payload.BlockHash,
+	}
+
+	packed, err := args.Pack(&_payload)
+
+	if err != nil {
+		n.log.Info("bad bad ", "err", err)
+		return nil, err
+	} else {
+		n.log.Info("abi encoded", "encoded payload", hexutil.Encode(packed))
+		return packed, nil
+	}
 }
