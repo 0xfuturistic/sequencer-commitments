@@ -193,12 +193,6 @@ contract SystemConfig is Screener, OwnableUpgradeable, Semver {
         _setCommitmentManager(newCommitmentManagerAddress);
     }
 
-    /// @notice Function for screening the proposer.
-    function screenProposer(bytes32 target, bytes memory value) external view returns (bool) {
-        address proposer = L2OutputOracle(this.l2OutputOracle()).proposer();
-        return screen(proposer, target, value);
-    }
-
     /// @notice Returns the minimum L2 gas limit that can be safely set for the system to
     ///         operate. The L2 gas limit must be larger than or equal to the amount of
     ///         gas that is allocated for deposits per block plus the amount of gas that
