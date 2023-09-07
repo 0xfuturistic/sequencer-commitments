@@ -28,7 +28,7 @@ func (n *OpNode) validateCommitments(ctx context.Context, payload *eth.Execution
 	}
 
 	// Calling Screen function
-	satisfied, err := instance.Screen(nil, n.runCfg.P2PSequencerAddress(), target(), payloadBytes)
+	satisfied, err := instance.Screen(nil, n.runCfg.P2PSequencerAddress(), n.target(), payloadBytes)
 	if err != nil {
 		return err
 	}
@@ -36,14 +36,13 @@ func (n *OpNode) validateCommitments(ctx context.Context, payload *eth.Execution
 		return errors.New("Failed_Screening")
 	}
 
-	// Satisfied
 	n.log.Info("Commitments are satisfied")
 	return nil
 }
 
-func target() [32]byte {
+func (n *OpNode) target() [32]byte {
 	var target [32]byte
-	copy(target[:], "placeholder-target")
+	copy(target[:], n.runCfg.rollupCfg.L1SystemConfigAddress.String())
 	return target
 }
 
@@ -95,14 +94,10 @@ func (n *OpNode) encodePayload(payload *eth.ExecutionPayload) ([]byte, error) {
 	}
 
 	packed, err := args.Pack(&_payload)
-
 	if err != nil {
-		n.log.Info("bad bad ", "err", err)
 		return nil, err
-	} else {
-		n.log.Info("abi encoded", "encoded payload", hexutil.Encode(packed))
-		return packed, nil
 	}
+	return packed, nil
 }
 
 func encodeTransactions(txs []eth.Data) []byte {
