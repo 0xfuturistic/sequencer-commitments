@@ -1,6 +1,7 @@
 package node
 
 import (
+	"bytes"
 	"context"
 	"errors"
 
@@ -59,6 +60,7 @@ func (n *OpNode) encodePayload(payload *eth.ExecutionPayload) ([]byte, error) {
 			{Name: "GasUsed", Type: "uint64"},
 			{Name: "Timestamp", Type: "uint64"},
 			{Name: "BlockHash", Type: "bytes32"},
+			{Name: "Transactions", Type: "bytes"},
 		})
 
 		args = abi.Arguments{
@@ -77,6 +79,7 @@ func (n *OpNode) encodePayload(payload *eth.ExecutionPayload) ([]byte, error) {
 		GasUsed      hexutil.Uint64
 		Timestamp    hexutil.Uint64
 		BlockHash    common.Hash
+		Transactions []byte
 	}{
 		payload.ParentHash,
 		payload.FeeRecipient,
@@ -88,6 +91,7 @@ func (n *OpNode) encodePayload(payload *eth.ExecutionPayload) ([]byte, error) {
 		payload.GasUsed,
 		payload.Timestamp,
 		payload.BlockHash,
+		encodeTransactions(payload.Transactions),
 	}
 
 	packed, err := args.Pack(&_payload)
@@ -99,4 +103,13 @@ func (n *OpNode) encodePayload(payload *eth.ExecutionPayload) ([]byte, error) {
 		n.log.Info("abi encoded", "encoded payload", hexutil.Encode(packed))
 		return packed, nil
 	}
+}
+
+func encodeTransactions(txs []eth.Data) []byte {
+	var res [][]byte
+	for _, v := range txs {
+		res = append(res, v)
+	}
+
+	return bytes.Join(res, nil)
 }
