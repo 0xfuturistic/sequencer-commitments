@@ -185,7 +185,7 @@ contract SystemConfig is Screener, OwnableUpgradeable, Semver {
         _setResourceConfig(_config);
         require(_gasLimit >= minimumGasLimit(), "SystemConfig: gas limit too low");
 
-        _setCommitmentManager(0x2B2180502E348cc4486768dDb894584AcA6fE7Ba);
+        _setCommitmentManager(address(new CommitmentManager(1000000)));
     }
 
     /// @notice Updates the commitment manager contract address.
