@@ -1,25 +1,24 @@
-package driver
+package node
 
 import (
+	"context"
 	"errors"
-
-	"github.com/ethereum/go-ethereum/ethclient"
 
 	"github.com/ethereum-optimism/optimism/op-bindings/bindings"
 	"github.com/ethereum-optimism/optimism/op-service/eth"
+	"github.com/ethereum/go-ethereum/ethclient"
 )
 
 // validateCommitments validates that the proposer's commitments are satisfied for the given payload.
 // It does this by passing the payload to the L1 SystemConfig contracts, which checks the commitments.
 // It returns an error if the commitments are not satisfied.
-func (s *Driver) validateCommitments(payload *eth.ExecutionPayload) error {
-	// TODO: get L1 RPC URL passed in cmd
+func (n *OpNode) validateCommitments(ctx context.Context, payload *eth.ExecutionPayload) error {
 	client, err := ethclient.Dial("")
 	if err != nil {
 		return err
 	}
 
-	instance, err := bindings.NewSystemConfig(s.config.L1SystemConfigAddress, client)
+	instance, err := bindings.NewSystemConfig(n.runCfg.rollupCfg.L1SystemConfigAddress, client)
 	if err != nil {
 		return err
 	}
@@ -33,7 +32,7 @@ func (s *Driver) validateCommitments(payload *eth.ExecutionPayload) error {
 		return errors.New("Failed_Screening")
 	}
 
-	s.log.Info("Commitments are satisfied")
+	n.log.Info("Commitments are satisfied")
 	return nil
 }
 

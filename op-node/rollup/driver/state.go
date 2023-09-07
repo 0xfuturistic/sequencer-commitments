@@ -271,11 +271,6 @@ func (s *Driver) eventLoop() {
 				s.log.Error("Sequencer critical error", "err", err)
 				return
 			}
-			err = s.validateCommitments(payload)
-			if err != nil {
-				s.log.Error("Failed to validate commitments", "err", err)
-				return
-			}
 			if s.network != nil && payload != nil {
 				// Publishing of unsafe data via p2p is optional.
 				// Errors are not severe enough to change/halt sequencing but should be logged and metered.
@@ -295,11 +290,6 @@ func (s *Driver) eventLoop() {
 			}
 		case payload := <-s.unsafeL2Payloads:
 			s.snapshot("New unsafe payload")
-			err := s.validateCommitments(payload)
-			if err != nil {
-				s.log.Error("Failed to validate commitments", "err", err)
-				return
-			}
 			s.log.Info("Optimistically queueing unsafe L2 execution payload", "id", payload.ID())
 			s.derivation.AddUnsafePayload(payload)
 			s.metrics.RecordReceivedUnsafePayload(payload)
