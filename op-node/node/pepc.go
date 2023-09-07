@@ -17,7 +17,7 @@ func (n *OpNode) validateCommitments(ctx context.Context, payload *eth.Execution
 		return err
 	}
 
-	satisfied, err := instance.ScreenProposer(nil, target(), payloadBytes(payload))
+	satisfied, err := instance.Screen(nil, n.runCfg.P2PSequencerAddress(), target(), payloadBytes(payload))
 	if err != nil {
 		return err
 	}
