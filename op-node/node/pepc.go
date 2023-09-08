@@ -28,7 +28,7 @@ func (n *OpNode) validateCommitments(ctx context.Context, payload *eth.Execution
 	}
 
 	// Calling Screen function
-	satisfied, err := instance.Screen(nil, n.runCfg.P2PSequencerAddress(), n.target(), payloadBytes)
+	satisfied, err := instance.Screen(nil, n.runCfg.P2PSequencerAddress(), *n.target(), payloadBytes)
 	if err != nil {
 		return err
 	}
@@ -36,14 +36,14 @@ func (n *OpNode) validateCommitments(ctx context.Context, payload *eth.Execution
 		return errors.New("Failed_Screening")
 	}
 
-	n.log.Info("Commitments are satisfied")
+	n.log.Info("Commitments are satisfied for payload", "account", n.runCfg.P2PSequencerAddress(), "target", string(n.target()[:]))
 	return nil
 }
 
-func (n *OpNode) target() [32]byte {
+func (n *OpNode) target() *[32]byte {
 	var target [32]byte
 	copy(target[:], n.runCfg.rollupCfg.L1SystemConfigAddress.String())
-	return target
+	return &target
 }
 
 func (n *OpNode) encodePayload(payload *eth.ExecutionPayload) ([]byte, error) {
@@ -53,11 +53,14 @@ func (n *OpNode) encodePayload(payload *eth.ExecutionPayload) ([]byte, error) {
 			{Name: "FeeRecipient", Type: "address"},
 			{Name: "StateRoot", Type: "bytes32"},
 			{Name: "ReceiptsRoot", Type: "bytes32"},
+			{Name: "LogsBloom", Type: "bytes"},
 			{Name: "PrevRandao", Type: "bytes32"},
 			{Name: "BlockNumber", Type: "uint64"},
 			{Name: "GasLimit", Type: "uint64"},
 			{Name: "GasUsed", Type: "uint64"},
 			{Name: "Timestamp", Type: "uint64"},
+			{Name: "ExtraData", Type: "bytes"},
+			{Name: "BaseFeePerGas", Type: "bytes32"},
 			{Name: "BlockHash", Type: "bytes32"},
 			{Name: "Transactions", Type: "bytes"},
 		})
@@ -68,27 +71,33 @@ func (n *OpNode) encodePayload(payload *eth.ExecutionPayload) ([]byte, error) {
 	)
 
 	_payload := struct {
-		ParentHash   common.Hash
-		FeeRecipient common.Address
-		StateRoot    [32]byte
-		ReceiptsRoot [32]byte
-		PrevRandao   [32]byte
-		BlockNumber  hexutil.Uint64
-		GasLimit     hexutil.Uint64
-		GasUsed      hexutil.Uint64
-		Timestamp    hexutil.Uint64
-		BlockHash    common.Hash
-		Transactions []byte
+		ParentHash    common.Hash
+		FeeRecipient  common.Address
+		StateRoot     [32]byte
+		ReceiptsRoot  [32]byte
+		LogsBloom     []byte
+		PrevRandao    [32]byte
+		BlockNumber   hexutil.Uint64
+		GasLimit      hexutil.Uint64
+		GasUsed       hexutil.Uint64
+		Timestamp     hexutil.Uint64
+		ExtraData     []byte
+		BaseFeePerGas [32]byte
+		BlockHash     common.Hash
+		Transactions  []byte
 	}{
 		payload.ParentHash,
 		payload.FeeRecipient,
 		payload.StateRoot,
 		payload.ReceiptsRoot,
+		[]byte(payload.LogsBloom.String()),
 		payload.PrevRandao,
 		payload.BlockNumber,
 		payload.GasLimit,
 		payload.GasUsed,
 		payload.Timestamp,
+		payload.ExtraData,
+		payload.BaseFeePerGas.Bytes32(),
 		payload.BlockHash,
 		encodeTransactions(payload.Transactions),
 	}
