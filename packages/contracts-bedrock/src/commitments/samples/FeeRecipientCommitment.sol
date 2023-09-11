@@ -12,7 +12,7 @@ contract FeeRecipientCommitment is CommitmentBase {
 
     constructor(L2OutputOracle l2OutputOracle_) CommitmentBase(l2OutputOracle_) { }
 
-    function setNewFeeRecipient(uint64 blockNumber, address feeRecipient) external {
+    function setNewFeeRecipient(address feeRecipient, uint64 blockNumber) external {
         require(!feeRecipientIsSet[msg.sender][blockNumber], "Fee recipient already set");
         feeRecipientSet[msg.sender][blockNumber] = feeRecipient;
         emit NewFeeRecipientSet(msg.sender, feeRecipient, blockNumber);
