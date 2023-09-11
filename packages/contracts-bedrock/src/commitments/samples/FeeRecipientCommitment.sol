@@ -1,7 +1,8 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.15;
 
-import {CommitmentBase} from "../CommitmentBase.sol";
+import { CommitmentBase } from "../CommitmentBase.sol";
+import { L2OutputOracle } from "../../L1/L2OutputOracle.sol";
 
 contract FeeRecipientCommitment is CommitmentBase {
     mapping(address => mapping(uint256 => bool)) public feeRecipientIsSet;
@@ -9,7 +10,7 @@ contract FeeRecipientCommitment is CommitmentBase {
 
     event NewFeeRecipientSet(address sequencer, address feeRecipient, uint64 blockNumber);
 
-    constructor(address l2OutputOracle_) CommitmentBase(l2OutputOracle_) {}
+    constructor(L2OutputOracle l2OutputOracle_) CommitmentBase(l2OutputOracle_) { }
 
     function setNewFeeRecipient(uint64 blockNumber, address feeRecipient) external {
         require(!feeRecipientIsSet[msg.sender][blockNumber], "Fee recipient already set");

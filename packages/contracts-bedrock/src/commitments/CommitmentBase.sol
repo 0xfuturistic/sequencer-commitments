@@ -23,7 +23,7 @@ contract CommitmentBase {
 
     L2OutputOracle public l2OutputOracle;
 
-    constructor(address l2OutputOracle_) {
-        l2OutputOracle = L2OutputOracle(l2OutputOracle_);
+    constructor(L2OutputOracle l2OutputOracle_) {
+        l2OutputOracle = l2OutputOracle_;
     }
 }
