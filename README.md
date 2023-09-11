@@ -1,4 +1,4 @@
-#OP Stack _Sequencer Commitments_
+# 🔴 OP Stack Sequencer Commitments
 
 **A hack for the OP-Stack introducing sophisticated sequencer commitments.**
 
@@ -8,27 +8,23 @@ Users that will become sequencers can enter into commitments in the EVM by using
 This initiative bridges the capabilities of Layer 1 and Layer 2, ensuring sequencers can make, manage, and fulfill commitments, ultimately fostering transparency and reliability in transaction ordering.
 
 ## 🌟 Key Features
-- **Dynamic Commitments**: Both user accounts and sequencers can initiate commitments in the L1 ecosystem.
+- **Dynamic Commitments**: Sequencers as user accounts can initiate commitments in the L1.
 - **L2 Reinforcement**: Commitments made by sequencers are enforced in L2, powered by a predetermined L1 contract.
-- **Flexible Design**: Sequencers can make commitments even if they weren't conceived during L1 contract deployment.
-- **Solidity Integration**: Commitments are anchored in L1 and visualized using Solidity's robust functions and targets.
+- **Flexible Design**: Sequencers can make commitments even if they weren't conceived during L2 contract deployment.
+- **Solidity Integration**: Commitments are anchored in L1 and stored as tuples of a function and a target, leveraging PEPC's Emily library.
 
-## 🛠 Use Cases
-1. **Dynamic Transaction Commitments**: Pledge to include transactions, even with properties not defined at the L1 contract launch.
-2. **Exclusion Commitments**: Promise not to incorporate specific transactions.
-3. **Programmable Policies**: Design custom transaction ordering rules within L2.
-4. **MEV Mitigation**: Deploy strategies in the EVM to mitigate Miner Extractable Value (MEV).
-5. **Contract Versatility**: Design general-purpose contracts between sequencers and external entities with satisfaction rules, all within the EVM.
-6. **Anti-Front Running Commitments**:
-7. Commitments to Off-Peak Transaction Processing:
-8. Front-Running Prevention
-Leveraging commitments to prevent front-running by fixing the transaction inclusion order, thereby precluding sequencers from exploiting user transactions based on privileged information.
-Technical Details: Utilizing commitments to establish a specific transaction ordering that is publicly known. The sequencer verifies these commitments through smart contracts in EVM before signing the block
-9. Atomic Swaps: Description: Facilitating atomic swaps by sequencing multi-step transactions in a particular order to ensure either successful swaps or no transaction at all.
-10. "Fair Sequencing Services": Description: Introducing fairness in transaction ordering to minimize MEV and foster a more equitable transaction environment.
-11. Commitments to Layered Prioritization: Different categories of transactions (like urgent, premium, standard) can be sequenced based on their priorities.
-Technical Detail: The sequencer's commitment would involve parsing the transaction type or attached metadata and ensuring that higher-priority transactions are sequenced ahead of others.
-12.
+## 🛠  Potential Use Cases:
+
+1. **Dynamic Transaction Integration**: Facilitate sequencer commitments for incorporating transactions with attributes not pre-defined during L1 contract instantiation.
+2. **Selective Transaction Exclusion**: Allow sequencers to commit to omitting specific transactions, ensuring a filtered transaction stream.
+3. **Customized Transaction Ordering**: Empower L2 with programmable sequencing policies, offering tailored transaction processing patterns.
+4. **MEV Mitigation Strategy**: Deploy advanced mechanisms in the EVM to counteract Miner Extractable Value vulnerabilities, enhancing network security.
+5. **Versatile Contractual Commitments**: Design and deploy L1-L2 interoperable contracts, facilitating granular interaction between sequencers and third parties, backed by EVM-defined satisfaction parameters.
+6. **Front-Running Prevention**: Leveraging commitments to prevent front-running by fixing the transaction inclusion order, thereby precluding sequencers from exploiting user transactions based on privileged information.
+8. **Atomic Swaps**: Description: Facilitating atomic swaps by sequencing multi-step transactions in a particular order to ensure either successful swaps or no transaction at all.
+9. **Commitments to Layered Prioritization**: Different categories of transactions (like urgent, premium, standard) can be sequenced based on their priorities.
+10. **Fair Sequencing Services**: Introducing fairness in transaction ordering to minimize MEV and foster a more equitable transaction environment.
+
 
 ## ⚙ Technical Blueprint
 **Harnessing Emily for Sequencer Commitments**
@@ -76,7 +72,11 @@ At the core of the EVM lies Emily's Screener contract, a guardian ensuring commi
 
 ```solidity
 contract Screener {
-    // Contract variables...
+    /// @notice Checks if the account's commitments are satisfied by the value being written.
+    /// @param account The account that is writing the value.
+    /// @param target The target to which the value is being written.
+    /// @param value The value being written.
+    /// @return True if the account's commitments are satisfied by the value being written, false otherwise.
     function screen(address account, bytes32 target, bytes memory value) public view virtual returns (bool) {
         return commitmentManager.areAccountCommitmentsSatisfiedByValue(account, target, value, block.timestamp);
     }
@@ -87,22 +87,12 @@ It's important to note that the sequencer even though is constrained in their be
 For a dive into the depths of the Emily library, please [explore this comprehensive guide](#). For those intrigued by the theoretical underpinnings, this [scholarly resource](#) is a treasure trove.
 
 ## 🗺 Road Ahead
-- Expand the variety of commitments within the EVM.
-- Enhance and solidify the test framework.
+- Expand the variety of commitments provided as a sample.
+- Enhance and solidify the tests.
 - Comprehensive documentation to accompany every feature, ensuring clarity.
-
-## 🚀 Getting Started
-For those eager to dive into the world of sequencer commitments, our [Quick Start Guide](#) is the perfect launchpad. It provides a step-by-step walkthrough, from installation to your first commitment!
 
 ## 🙌 Contribute & Feedback
 Your insights can shape the future of this initiative. Feel free to [raise an issue](#), suggest a feature, or even fork the repository for personal tweaks. We thrive on collaborative brilliance!
 
 ## 📜 License
 This project is licensed under the MIT License. For more details, please see our [LICENSE file](#).
-
-## 🙏 Acknowledgments
-A big shout-out to our collaborators, supporters, and the Ethereum community for their unwavering encouragement and invaluable feedback. Special thanks to the teams behind Solidity and Ethereum for their pioneering work.
-
----
-
-Thank you for your interest in our project. Together, we're building the next chapter in Ethereum's L2 narrative.
