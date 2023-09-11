@@ -17,13 +17,12 @@ This initiative bridges the capabilities of Layer 1 and Layer 2, ensuring sequen
 
 ## 🛠  Potential Use Cases:
 
-1. **Dynamic Transaction Integration**: Facilitate sequencer commitments for incorporating transactions with attributes not pre-defined during L1 contract instantiation.
-2. **Selective Transaction Exclusion**: Allow sequencers to commit to omitting specific transactions, ensuring a filtered transaction stream.
+1. **Dynamic Transaction Integration**: Facilitate sequencer commitments for the inclusion of transactions with attributes defined after L2 contract deployment.
 3. **Customized Transaction Ordering**: Empower L2 with programmable sequencing policies, offering tailored transaction processing patterns.
-4. **MEV Mitigation Strategy**: Deploy advanced mechanisms in the EVM to counteract Miner Extractable Value vulnerabilities, enhancing network security.
-5. **Versatile Contractual Commitments**: Design and deploy L1-L2 interoperable contracts, facilitating granular interaction between sequencers and third parties, backed by EVM-defined satisfaction parameters.
-6. **Front-Running Prevention**: Leveraging commitments to prevent front-running by fixing the transaction inclusion order, thereby precluding sequencers from exploiting user transactions based on privileged information.
-8. **Atomic Swaps**: Description: Facilitating atomic swaps by sequencing multi-step transactions in a particular order to ensure either successful swaps or no transaction at all.
+4. **MEV Mitigation Strategy**: Design strategies in Solidity to mitigate MEV by leveraging commitments to sequence transactions in a particular order.
+5. **Versatile Contractual Commitments**: Design and deploy L1-L2 interoperable contracts, facilitating granular interaction between sequencers and third parties, backed by EVM-defined commitments.
+6. **Front-Running Prevention**: Leveraging commitments to prevent front-running by committing to properties about the transaction inclusion order.
+8. **Multi-Chain Atomic Swaps**: Facilitating atomic swaps by sequencing multi-step transactions in a particular order to ensure either successful swaps or no transaction at all.
 9. **Commitments to Layered Prioritization**: Different categories of transactions (like urgent, premium, standard) can be sequenced based on their priorities.
 10. **Fair Sequencing Services**: Introducing fairness in transaction ordering to minimize MEV and foster a more equitable transaction environment.
 
@@ -32,7 +31,7 @@ This initiative bridges the capabilities of Layer 1 and Layer 2, ensuring sequen
 **Harnessing Emily for Sequencer Commitments**
 
 ### Client's Perspective:
-The `OnUnsafeL2Payload` function, at the heart of the client's stack, is responsible for assimilating new blocks. This is now integrated with the call to `n.validateCommitments(ctx, payload)`, ensuring every block respects its sequencer commitments. All of these are brought to life in the EVM with Emily's prowess.
+The `OnUnsafeL2Payload` function, at the heart of the client's stack, is responsible for assimilating new blocks. This is now integrated with the call to `n.validateCommitments(ctx, payload)`, ensuring every block respects its sequencer commitments. The logic for these commitments is implemented in the EVM by Emily.
 
 **Insightful Code Snippets**:
 ```go
@@ -70,7 +69,7 @@ func (n *OpNode) validateCommitments(ctx context.Context, payload *eth.Execution
 ```
 
 ### EVM's Role:
-At the core of the EVM lies Emily's Screener contract, a guardian ensuring commitments are upheld.
+At the core of the EVM lies Emily's Screener contract, which allows for filtering payloads based on commitments. The `screen` function is responsible for checking whether the commitments of the sequencer are satisfied by the payload being screened. This is done by invoking the `areAccountCommitmentsSatisfiedByValue` function of the commitment manager, which is responsible for checking whether the commitments of the sequencer are satisfied by the value being written.
 
 ```solidity
 contract Screener {
@@ -84,9 +83,9 @@ contract Screener {
     }
 }
 ```
-It's important to note that the sequencer even though is constrained in their behavior by the commitment may choose not to provide their signature in the first place. So the sequencer can't be forced to act in a particular way. Rather, we prevent them from doing taking certain actions by rejecting their payloads when they don't respect their commitments.
+It's important to note that even though they are constrained in their behavior by their commitment, a sequencer may choose not to provide their signature in the first place. So the sequencer can't be forced to act in a particular way. Rather, we prevent them from doing so in other ways, specifically those that would violate their commitments.
 
-For a dive into the depths of the Emily library, please [explore this comprehensive guide](#). For those intrigued by the theoretical underpinnings, this [scholarly resource](#) is a treasure trove.
+You can see the codebase for Emily [here](https://github.com/0xfuturistic/emily). As background, I recommend you check out [this Twitter thread](https://twitter.com/0xfuturistic/status/1697306608722915518) and the piece introducing [PEPC-DVT](https://ethresear.ch/t/pepc-dvt-pepc-with-no-changes-to-the-consensus-protocol/16514).
 
 ## 🗺 Road Ahead
 - Expand the variety of commitments provided as a sample.
@@ -94,7 +93,7 @@ For a dive into the depths of the Emily library, please [explore this comprehens
 - Comprehensive documentation to accompany every feature, ensuring clarity.
 
 ## 🙌 Contribute & Feedback
-Your insights can shape the future of this initiative. Feel free to [raise an issue](#), suggest a feature, or even fork the repository for personal tweaks. We thrive on collaborative brilliance!
+Your insights can shape the future of this initiative. Feel free to [raise an issue](#), suggest a feature, or even fork the repository for personal tweaks.
 
 ## 📜 License
-This project is licensed under the MIT License. For more details, please see our [LICENSE file](#).
+This project is licensed under the MIT License. For more details, please see [LICENSE file](#).
