@@ -14,6 +14,7 @@ contract FeeRecipientCommitment is CommitmentBase {
 
     function setNewFeeRecipient(address feeRecipient, uint64 blockNumber) external {
         require(!feeRecipientIsSet[msg.sender][blockNumber], "Fee recipient already set");
+        feeRecipientIsSet[msg.sender][blockNumber] = true;
         feeRecipientSet[msg.sender][blockNumber] = feeRecipient;
         emit NewFeeRecipientSet(msg.sender, feeRecipient, blockNumber);
     }
