@@ -1,146 +1,108 @@
-<div align="center">
-  <br />
-  <br />
-  <a href="https://optimism.io"><img alt="Optimism" src="https://raw.githubusercontent.com/ethereum-optimism/brand-kit/main/assets/svg/OPTIMISM-R.svg" width=600></a>
-  <br />
-  <h3><a href="https://optimism.io">Optimism</a> is Ethereum, scaled.</h3>
-  <br />
-</div>
+#OP Stack _Sequencer Commitments_
 
-## What is Optimism?
+**A hack for the OP-Stack introducing sophisticated sequencer commitments.**
 
-[Optimism](https://www.optimism.io/) is a project dedicated to scaling Ethereum's technology and expanding its ability to coordinate people from across the world to build effective decentralized economies and governance systems. The [Optimism Collective](https://app.optimism.io/announcement) builds open-source software for running L2 blockchains and aims to address key governance and economic challenges in the wider cryptocurrency ecosystem. Optimism operates on the principle of **impact=profit**, the idea that individuals who positively impact the Collective should be proportionally rewarded with profit. **Change the incentives and you change the world.**
+Users that will become sequencers can enter into commitments in the EVM by using Emily, a library for manging commitments in the EVM developed for PEPC. This hack is a proof of concept for the OP-Stack, and it is not intended to be used in production.
 
-In this repository, you'll find numerous core components of the OP Stack, the decentralized software stack maintained by the Optimism Collective that powers Optimism and forms the backbone of blockchains like [OP Mainnet](https://explorer.optimism.io/) and [Base](https://base.org). Designed to be "aggressively open source," the OP Stack encourages you to explore, modify, extend, and test the code as needed. Although not all elements of the OP Stack are contained here, many of its essential components can be found within this repository. By collaborating on free, open software and shared standards, the Optimism Collective aims to prevent siloed software development and rapidly accelerate the development of the Ethereum ecosystem. Come contribute, build the future, and redefine power, together.
+## Why This Matters
+This initiative bridges the capabilities of Layer 1 and Layer 2, ensuring sequencers can make, manage, and fulfill commitments, ultimately fostering transparency and reliability in transaction ordering.
 
-## Documentation
+## 🌟 Key Features
+- **Dynamic Commitments**: Both user accounts and sequencers can initiate commitments in the L1 ecosystem.
+- **L2 Reinforcement**: Commitments made by sequencers are enforced in L2, powered by a predetermined L1 contract.
+- **Flexible Design**: Sequencers can make commitments even if they weren't conceived during L1 contract deployment.
+- **Solidity Integration**: Commitments are anchored in L1 and visualized using Solidity's robust functions and targets.
 
-- If you want to build on top of OP Mainnet, refer to the [Optimism Community Hub](https://community.optimism.io)
-- If you want to build your own OP Stack based blockchain, refer to the [OP Stack docs](https://stack.optimism.io)
-- If you want to contribute to the OP Stack, check out the [Protocol Specs](./specs)
+## 🛠 Use Cases
+1. **Dynamic Transaction Commitments**: Pledge to include transactions, even with properties not defined at the L1 contract launch.
+2. **Exclusion Commitments**: Promise not to incorporate specific transactions.
+3. **Programmable Policies**: Design custom transaction ordering rules within L2.
+4. **MEV Mitigation**: Deploy strategies in the EVM to mitigate Miner Extractable Value (MEV).
+5. **Contract Versatility**: Design general-purpose contracts between sequencers and external entities with satisfaction rules, all within the EVM.
+6. **Anti-Front Running Commitments**:
+7. Commitments to Off-Peak Transaction Processing:
+8. Front-Running Prevention
+Leveraging commitments to prevent front-running by fixing the transaction inclusion order, thereby precluding sequencers from exploiting user transactions based on privileged information.
+Technical Details: Utilizing commitments to establish a specific transaction ordering that is publicly known. The sequencer verifies these commitments through smart contracts in EVM before signing the block
+9. Atomic Swaps: Description: Facilitating atomic swaps by sequencing multi-step transactions in a particular order to ensure either successful swaps or no transaction at all.
+10. "Fair Sequencing Services": Description: Introducing fairness in transaction ordering to minimize MEV and foster a more equitable transaction environment.
+11. Commitments to Layered Prioritization: Different categories of transactions (like urgent, premium, standard) can be sequenced based on their priorities.
+Technical Detail: The sequencer's commitment would involve parsing the transaction type or attached metadata and ensuring that higher-priority transactions are sequenced ahead of others.
+12.
 
-## Community
+## ⚙ Technical Blueprint
+**Harnessing Emily for Sequencer Commitments**
 
-General discussion happens most frequently on the [Optimism discord](https://discord.gg/optimism).
-Governance discussion can also be found on the [Optimism Governance Forum](https://gov.optimism.io/).
+### Client's Perspective:
+The `OnUnsafeL2Payload` function, at the heart of the client's stack, is responsible for assimilating new blocks. This is now integrated with the call to `n.validateCommitments(ctx, payload)`, ensuring every block respects its sequencer commitments. All of these are brought to life in the EVM with Emily's prowess.
 
-## Contributing
+**Insightful Code Snippets**:
+```go
+// In op-node/node/node.go
+func (n *OpNode) OnUnsafeL2Payload(ctx context.Context, from peer.ID, payload *eth.ExecutionPayload) error {
+    // Essential operations...
 
-Read through [CONTRIBUTING.md](./CONTRIBUTING.md) for a general overview of the contributing process for this repository.
-Use the [Developer Quick Start](./CONTRIBUTING.md#development-quick-start) to get your development environment set up to start working on the Optimism Monorepo.
-Then check out the list of [Good First Issues](https://github.com/ethereum-optimism/optimism/contribute) to find something fun to work on!
+    // Commitments check
+    if err := n.validateCommitments(ctx, payload); err != nil {
+        return err
+    }
+    // Concluding operations...
+}
+```
 
-## Security Policy and Vulnerability Reporting
+```go
+// Residing in op-node/node/pepc.go
+func (n *OpNode) validateCommitments(ctx context.Context, payload *eth.ExecutionPayload) error {
+    // Convert payload to bytecode
+    payloadBytes, err := n.encodePayload(payload)
+    if err != nil {
+        return err
+    }
 
-Please refer to the canonical [Security Policy](https://github.com/ethereum-optimism/.github/blob/master/SECURITY.md) document for detailed information about how to report vulnerabilities in this codebase.
-Bounty hunters are encouraged to check out [the Optimism Immunefi bug bounty program](https://immunefi.com/bounty/optimism/).
-The Optimism Immunefi program offers up to $2,000,042 for in-scope critical vulnerabilities.
+    // Invoke the Screener
+    satisfied, err := instance.Screen(nil, n.runCfg.P2PSequencerAddress(), *n.target(), payloadBytes)
 
-## The Bedrock Upgrade
+    if err != nil {
+        return err
+    }
+    if !satisfied {
+        return errors.New("ScreeningFailed")
+    }
+}
+```
 
-OP Mainnet is currently preparing for [its next major upgrade, Bedrock](https://dev.optimism.io/introducing-optimism-bedrock/).
-You can find detailed specifications for the Bedrock upgrade within the [specs folder](./specs) in this repository.
+### EVM's Role:
+At the core of the EVM lies Emily's Screener contract, a guardian ensuring commitments are upheld.
 
-Please note that a significant number of packages and folders within this repository are part of the Bedrock upgrade and are NOT currently running in production.
-Refer to the Directory Structure section below to understand which packages are currently running in production and which are intended for use as part of the Bedrock upgrade.
+```solidity
+contract Screener {
+    // Contract variables...
+    function screen(address account, bytes32 target, bytes memory value) public view virtual returns (bool) {
+        return commitmentManager.areAccountCommitmentsSatisfiedByValue(account, target, value, block.timestamp);
+    }
+}
+```
+It's important to note that the sequencer even though is constrained in their behavior by the commitment may choose not to provide their signature in the first place. So the sequencer can't be forced to act in a particular way. Rather, we prevent them from doing taking certain actions by rejecting their payloads when they don't respect their commitments.
 
-## Directory Structure
+For a dive into the depths of the Emily library, please [explore this comprehensive guide](#). For those intrigued by the theoretical underpinnings, this [scholarly resource](#) is a treasure trove.
 
-<pre>
-├── <a href="./docs">docs</a>: A collection of documents including audits and post-mortems
-├── <a href="./op-bindings">op-bindings</a>: Go bindings for Bedrock smart contracts.
-├── <a href="./op-batcher">op-batcher</a>: L2-Batch Submitter, submits bundles of batches to L1
-├── <a href="./op-bootnode">op-bootnode</a>: Standalone op-node discovery bootnode
-├── <a href="./op-chain-ops">op-chain-ops</a>: State surgery utilities
-├── <a href="./op-challenger">op-challenger</a>: Dispute game challenge agent
-├── <a href="./op-e2e">op-e2e</a>: End-to-End testing of all bedrock components in Go
-├── <a href="./op-exporter">op-exporter</a>: Prometheus exporter client
-├── <a href="./op-heartbeat">op-heartbeat</a>: Heartbeat monitor service
-├── <a href="./op-node">op-node</a>: rollup consensus-layer client
-├── <a href="./op-preimage">op-preimage</a>: Go bindings for Preimage Oracle
-├── <a href="./op-program">op-program</a>: Fault proof program
-├── <a href="./op-proposer">op-proposer</a>: L2-Output Submitter, submits proposals to L1
-├── <a href="./op-service">op-service</a>: Common codebase utilities
-├── <a href="./op-signer">op-signer</a>: Client signer
-├── <a href="./op-wheel">op-wheel</a>: Database utilities
-├── <a href="./ops-bedrock">ops-bedrock</a>: Bedrock devnet work
-├── <a href="./packages">packages</a>
-│   ├── <a href="./packages/chain-mon">chain-mon</a>: Chain monitoring services
-│   ├── <a href="./packages/common-ts">common-ts</a>: Common tools for building apps in TypeScript
-│   ├── <a href="./packages/contracts-ts">contracts-ts</a>: ABI and Address constants
-│   ├── <a href="./packages/contracts-bedrock">contracts-bedrock</a>: Bedrock smart contracts
-│   ├── <a href="./packages/core-utils">core-utils</a>: Low-level utilities that make building Optimism easier
-│   └── <a href="./packages/sdk">sdk</a>: provides a set of tools for interacting with Optimism
-├── <a href="./proxyd">proxyd</a>: Configurable RPC request router and proxy
-└── <a href="./specs">specs</a>: Specs of the rollup starting at the Bedrock upgrade
-</pre>
+## 🗺 Road Ahead
+- Expand the variety of commitments within the EVM.
+- Enhance and solidify the test framework.
+- Comprehensive documentation to accompany every feature, ensuring clarity.
 
-## Branching Model
+## 🚀 Getting Started
+For those eager to dive into the world of sequencer commitments, our [Quick Start Guide](#) is the perfect launchpad. It provides a step-by-step walkthrough, from installation to your first commitment!
 
-### Active Branches
+## 🙌 Contribute & Feedback
+Your insights can shape the future of this initiative. Feel free to [raise an issue](#), suggest a feature, or even fork the repository for personal tweaks. We thrive on collaborative brilliance!
 
-| Branch          | Status                                                                           |
-| --------------- | -------------------------------------------------------------------------------- |
-| [master](https://github.com/ethereum-optimism/optimism/tree/master/)                   | Accepts PRs from `develop` when intending to deploy to production.                  |
-| [develop](https://github.com/ethereum-optimism/optimism/tree/develop/)                 | Accepts PRs that are compatible with `master` OR from `release/X.X.X` branches.                    |
-| release/X.X.X                                                                          | Accepts PRs for all changes, particularly those not backwards compatible with `develop` and `master`. |
+## 📜 License
+This project is licensed under the MIT License. For more details, please see our [LICENSE file](#).
 
-### Overview
+## 🙏 Acknowledgments
+A big shout-out to our collaborators, supporters, and the Ethereum community for their unwavering encouragement and invaluable feedback. Special thanks to the teams behind Solidity and Ethereum for their pioneering work.
 
-This repository generally follows [this Git branching model](https://nvie.com/posts/a-successful-git-branching-model/).
-Please read the linked post if you're planning to make frequent PRs into this repository.
+---
 
-### Production branch
-
-The production branch is `master`.
-The `master` branch contains the code for latest "stable" releases.
-Updates from `master` **always** come from the `develop` branch.
-
-### Development branch
-
-The primary development branch is [`develop`](https://github.com/ethereum-optimism/optimism/tree/develop/).
-`develop` contains the most up-to-date software that remains backwards compatible with the latest experimental [network deployments](https://community.optimism.io/docs/useful-tools/networks/).
-If you're making a backwards compatible change, please direct your pull request towards `develop`.
-
-**Changes to contracts within `packages/contracts-bedrock/src` are usually NOT considered backwards compatible and SHOULD be made against a release candidate branch**.
-Some exceptions to this rule exist for cases in which we absolutely must deploy some new contract after a release candidate branch has already been fully deployed.
-If you're changing or adding a contract and you're unsure about which branch to make a PR into, default to using the latest release candidate branch.
-See below for info about release candidate branches.
-
-### Release candidate branches
-
-Branches marked `release/X.X.X` are **release candidate branches**.
-Changes that are not backwards compatible and all changes to contracts within `packages/contracts-bedrock/src` MUST be directed towards a release candidate branch.
-Release candidates are merged into `develop` and then into `master` once they've been fully deployed.
-We may sometimes have more than one active `release/X.X.X` branch if we're in the middle of a deployment.
-See table in the **Active Branches** section above to find the right branch to target.
-
-## Releases
-
-### Changesets
-
-We use [changesets](https://github.com/changesets/changesets) to mark packages for new releases.
-When merging commits to the `develop` branch you MUST include a changeset file if your change would require that a new version of a package be released.
-
-To add a changeset, run the command `pnpm changeset` in the root of this monorepo.
-You will be presented with a small prompt to select the packages to be released, the scope of the release (major, minor, or patch), and the reason for the release.
-Comments within changeset files will be automatically included in the changelog of the package.
-
-### Triggering Releases
-
-Releases can be triggered using the following process:
-
-1. Create a PR that merges the `develop` branch into the `master` branch.
-2. Wait for the auto-generated `Version Packages` PR to be opened (may take several minutes).
-3. Change the base branch of the auto-generated `Version Packages` PR from `master` to `develop` and merge into `develop`.
-4. Create a second PR to merge the `develop` branch into the `master` branch.
-
-After merging the second PR into the `master` branch, packages will be automatically released to their respective locations according to the set of changeset files in the `develop` branch at the start of the process.
-Please carry this process out exactly as listed to avoid `develop` and `master` falling out of sync.
-
-**NOTE**: PRs containing changeset files merged into `develop` during the release process can cause issues with changesets that can require manual intervention to fix.
-It's strongly recommended to avoid merging PRs into develop during an active release.
-
-## License
-
-All other files within this repository are licensed under the [MIT License](https://github.com/ethereum-optimism/optimism/blob/master/LICENSE) unless stated otherwise.
+Thank you for your interest in our project. Together, we're building the next chapter in Ethereum's L2 narrative.
