@@ -2,6 +2,8 @@
 
 **A hack for the OP-Stack introducing sophisticated sequencer commitments.**
 
+![Alt Text](first.gif)
+
 Users that will become sequencers can enter into commitments in the EVM by using Emily, a library for manging commitments in the EVM developed for PEPC. This hack is a proof of concept for the OP-Stack, and it is not intended to be used in production.
 
 ## Why This Matters
