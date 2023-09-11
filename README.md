@@ -1,23 +1,23 @@
 # 🔴 OP Stack Sequencer Commitments
 
-**A hack for the OP-Stack introducing sophisticated sequencer commitments.**
+**A hack for the OP-Stack introducing EVM-programmed sequencer commitments.**
 
 ![Alt Text](first.gif)
 
-Users that will become sequencers can enter into commitments in the EVM by using Emily, a library for manging commitments in the EVM developed for PEPC. This hack is a proof of concept for the OP-Stack, and it is not intended to be used in production.
+Users that will become sequencers can enter into commitments in the EVM by leveraging [Emily](https://github.com/0xfuturistic/emily), a library for manging commitments in the EVM developed for [PEPC-DVT](https://ethresear.ch/t/pepc-dvt-pepc-with-no-changes-to-the-consensus-protocol/16514). This hack is a proof of concept for the OP-Stack, and it is not intended to be used in production.
 
 ## Why This Matters
 This initiative bridges the capabilities of Layer 1 and Layer 2, ensuring sequencers can make, manage, and fulfill commitments, ultimately fostering transparency and reliability in transaction ordering.
 
 ## 🌟 Key Features
-- **Dynamic Commitments**: Sequencers as user accounts can initiate commitments in the L1.
+- **Dynamic Commitments**: Sequencers, as accounts, can initiate commitments in the L1.
 - **L2 Reinforcement**: Commitments made by sequencers are enforced in L2, powered by a predetermined L1 contract.
 - **Flexible Design**: Sequencers can make commitments even if they weren't conceived during L2 contract deployment.
-- **Solidity Integration**: Commitments are anchored in L1 and stored as tuples of a function and a target, leveraging PEPC's Emily library.
+- **Solidity Integration**: Commitments are anchored in L1 and stored as tuples of a function and a target, leveraging PEPC-DVT's model.
 
 ## 🛠  Potential Use Cases:
 
-1. **Dynamic Transaction Integration**: Facilitate sequencer commitments for the inclusion of transactions with attributes defined after L2 contract deployment.
+1. **Dynamic Transaction Integration**: Facilitate sequencer commitments for the inclusion of transactions with attributes defined after L2 deployment.
 3. **Customized Transaction Ordering**: Empower L2 with programmable sequencing policies, offering tailored transaction processing patterns.
 4. **MEV Mitigation Strategy**: Design strategies in Solidity to mitigate MEV by leveraging commitments to sequence transactions in a particular order.
 5. **Versatile Contractual Commitments**: Design and deploy L1-L2 interoperable contracts, facilitating granular interaction between sequencers and third parties, backed by EVM-defined commitments.
