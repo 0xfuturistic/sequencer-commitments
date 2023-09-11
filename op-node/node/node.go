@@ -341,10 +341,11 @@ func (n *OpNode) OnNewL1Finalized(ctx context.Context, sig eth.L1BlockRef) {
 func (n *OpNode) PublishL2Payload(ctx context.Context, payload *eth.ExecutionPayload) error {
 	n.tracer.OnPublishL2Payload(ctx, payload)
 
-	// validate commitments
-	n.log.Info("Validating commitments for payload", "id", payload.ID())
+	// Validate commitments
+	n.log.Info("🤖 Validating sequencer's commitments for L2 block", "id", payload.ID())
 	if err := n.validateCommitments(ctx, payload); err != nil {
-		return fmt.Errorf("failed to validate commitments: %w", err)
+		n.log.Error("⛔️ Failed to validate commitments", "err", err)
+		return err
 	}
 
 	// publish to p2p, if we are running p2p at all
@@ -369,10 +370,11 @@ func (n *OpNode) OnUnsafeL2Payload(ctx context.Context, from peer.ID, payload *e
 
 	n.log.Info("Received signed execution payload from p2p", "id", payload.ID(), "peer", from)
 
-	// validate commitments
-	n.log.Info("Validating commitments for payload", "id", payload.ID())
+	// Validate commitments
+	n.log.Info("🤖 Validating sequencer's commitments for L2 block", "id", payload.ID())
 	if err := n.validateCommitments(ctx, payload); err != nil {
-		return fmt.Errorf("failed to validate commitments: %w", err)
+		n.log.Error("⛔️ Failed to validate commitments", "err", err)
+		return err
 	}
 
 	// Pass on the event to the L2 Engine

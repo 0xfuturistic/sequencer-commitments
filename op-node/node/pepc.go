@@ -36,13 +36,13 @@ func (n *OpNode) validateCommitments(ctx context.Context, payload *eth.Execution
 		return errors.New("Failed_Screening")
 	}
 
-	n.log.Info("Commitments are satisfied for payload", "account", n.runCfg.P2PSequencerAddress(), "target", string(n.target()[:]))
+	n.log.Info("Commitments satisfied", "sequencer", n.runCfg.P2PSequencerAddress())
 	return nil
 }
 
 func (n *OpNode) target() *[32]byte {
 	var target [32]byte
-	copy(target[:], common.Hex2BytesFixed("0x0000000000000000000000000000000000000000000000000000000000000000", 32))
+	copy(target[:], common.Hex2BytesFixed("0x0000000000000000000000000000000000000000000000000000000000000001", 32))
 	return &target
 }
 
