@@ -42,7 +42,7 @@ func (n *OpNode) validateCommitments(ctx context.Context, payload *eth.Execution
 
 func (n *OpNode) target() *[32]byte {
 	var target [32]byte
-	copy(target[:], n.runCfg.rollupCfg.L1SystemConfigAddress.String())
+	copy(target[:], common.Hex2BytesFixed("0x0000000000000000000000000000000000000000000000000000000000000000", 32))
 	return &target
 }
 
