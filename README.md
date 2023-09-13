@@ -7,7 +7,7 @@
 Users that will become sequencers can enter into commitments in the EVM by leveraging [Emily](https://github.com/0xfuturistic/emily), a library for managing commitments on-chain developed for [PEPC-DVT](https://ethresear.ch/t/pepc-dvt-pepc-with-no-changes-to-the-consensus-protocol/16514). This hack is a proof of concept for the [OP Stack](https://stack.optimism.io/), and it is not intended to be used in production.
 
 ## Why This Matters
-This initiative bridges the capabilities of Layer 1 and Layer 2, ensuring sequencers can make, manage, and fulfill commitments, ultimately fostering transparency and reliability in transaction ordering and powering general-purpose contracting between sequencers and third parties.
+As L2s gain momentum, sequencers' capacity to establish credible commitments becomes ever more important. This not only enhances transparency in transaction ordering but also holds the potential for versatile, general-purpose contracting with the sequencer as the counterparty.
 
 ## Background Readings
  I recommend checking out this [thread](https://twitter.com/0xfuturistic/status/1697306608722915518) and the article introducing [PEPC-DVT](https://ethresear.ch/t/pepc-dvt-pepc-with-no-changes-to-the-consensus-protocol/16514).
