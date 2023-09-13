@@ -1,6 +1,6 @@
 # 🔴 OP Stack Sequencer Commitments
 
-**A hack for the OP Stack that introduces sequencer commitments.**
+**A hack for the OP Stack introducing sequencer commitments.**
 
 ![Alt Text](cover.gif)
 
