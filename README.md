@@ -85,8 +85,7 @@ contract Screener {
 ```
 It's also worth noting that even though they are constrained in their behavior by their commitments, a sequencer may choose not to provide their signature in the first place. So the sequencer can't be forced to act in a particular way. Rather, we prevent them from doing so in specific ways (i.e., in ways that violate their commitments).
 
-For any questions, feel free to reach out via [Twitter](https://twitter.com/0xfuturistic/).
-
+![Alt text](swimlanes.png)
 
 ## 🗺 Road Ahead
 - Expand the variety of commitments provided as a sample.
