@@ -9,6 +9,11 @@ Users that will become sequencers can enter into commitments in the EVM by lever
 ## Why This Matters
 This initiative bridges the capabilities of Layer 1 and Layer 2, ensuring sequencers can make, manage, and fulfill commitments, ultimately fostering transparency and reliability in transaction ordering and powering general-purpose contracting between sequencers and third parties.
 
+## Background Readings
+ I recommend checking out this [thread](https://twitter.com/0xfuturistic/status/1697306608722915518) and the article introducing [PEPC-DVT](https://ethresear.ch/t/pepc-dvt-pepc-with-no-changes-to-the-consensus-protocol/16514).
+
+ A [sample commitment](https://github.com/0xfuturistic/sequencer-commitments/blob/develop/packages/contracts-bedrock/src/commitments/samples/FeeRecipientCommitment.sol) is included, which allows the sequencer to commit to fee recipients for specific blocks.
+
 ## 🌟 Key Features
 - **Dynamic Commitments**: Sequencers, as accounts, can enter into commitments in the L1.
 - **L2 Enforcement**: Commitments made by sequencers are enforced on L2 blocks, with the logic outsourced to a a predetermined L1 contract.
@@ -24,11 +29,6 @@ This initiative bridges the capabilities of Layer 1 and Layer 2, ensuring sequen
 5. **Multi-Chain Atomic Operations**: Facilitating atomic operations by sequencing multi-step transactions in a particular order to ensure either successful operations or no transaction at all.
 6. **Commitments to Layered Prioritization**: Different categories of transactions (like urgent, premium, standard) can be sequenced based on their priorities.
 7. **_Sequencing Services_**: Introducing features such as fairness in transaction ordering to minimize MEV and foster a more equitable transaction environment.
-
-## 🔙 Background Readings
- I recommend checking out this [thread](https://twitter.com/0xfuturistic/status/1697306608722915518) and the piece introducing [PEPC-DVT](https://ethresear.ch/t/pepc-dvt-pepc-with-no-changes-to-the-consensus-protocol/16514). You can learn more about Emily [here](https://ethresear.ch/t/pepc-dvt-pepc-with-no-changes-to-the-consensus-protocol/16514#emily-a-protocol-for-credible-commitments-14).
-
- You can see a sample commitment for sequencer [here](https://github.com/0xfuturistic/sequencer-commitments/blob/develop/packages/contracts-bedrock/src/commitments/samples/FeeRecipientCommitment.sol). This commitment allows the sequencer to commit to fee recipients for specific blocks.
 
 ## ⚙ Technical Blueprint
 ### In the Rollup Client
