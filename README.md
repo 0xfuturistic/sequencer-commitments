@@ -17,14 +17,13 @@ This initiative bridges the capabilities of Layer 1 and Layer 2, ensuring sequen
 
 ## 🛠  Potential Use Cases:
 
-1. **Dynamic Transaction Inclusion**: Facilitate sequencer commitments for the inclusion of transactions with attributes defined after L2 deployment.
-3. **Customized Transaction Ordering**: Empower L2 with programmable sequencing policies, offering tailored transaction processing patterns.
-4. **MEV Mitigation**: Design strategies in Solidity to mitigate MEV by leveraging commitments to sequence transactions in a particular way.
-5. **General-purpose Contracts**: Design and deploy L1-L2 interoperable contracts, facilitating granular interaction between sequencers and third parties, backed by EVM-defined commitments.
-6. **Front-Running Prevention**: Leveraging commitments to prevent front-running by committing to including a transaction as the first in the block or with only some specific transactions before it.
-8. **Multi-Chain Atomic Operations**: Facilitating atomic operations by sequencing multi-step transactions in a particular order to ensure either successful operations or no transaction at all.
-9. **Commitments to Layered Prioritization**: Different categories of transactions (like urgent, premium, standard) can be sequenced based on their priorities.
-10. **_Sequencing Services_**: Introducing features such as fairness in transaction ordering to minimize MEV and foster a more equitable transaction environment.
+1. **Customized Transaction Ordering**: Empower L2 with programmable sequencing policies, offering tailored transaction processing patterns.
+2. **MEV Mitigation**: Design strategies in Solidity to mitigate MEV by leveraging commitments to sequence transactions in a particular way.
+3. **General-purpose Contracts**: Design and deploy L1-L2 interoperable contracts, facilitating granular interaction between sequencers and third parties, backed by EVM-defined commitments.
+4. **Front-Running Prevention**: Leveraging commitments to prevent front-running by committing to including a transaction as the first in the block or with only some specific transactions before it.
+5. **Multi-Chain Atomic Operations**: Facilitating atomic operations by sequencing multi-step transactions in a particular order to ensure either successful operations or no transaction at all.
+6. **Commitments to Layered Prioritization**: Different categories of transactions (like urgent, premium, standard) can be sequenced based on their priorities.
+7. **_Sequencing Services_**: Introducing features such as fairness in transaction ordering to minimize MEV and foster a more equitable transaction environment.
 
 ## 🔙 Background Readings
  I recommend checking out this [thread](https://twitter.com/0xfuturistic/status/1697306608722915518) and the piece introducing [PEPC-DVT](https://ethresear.ch/t/pepc-dvt-pepc-with-no-changes-to-the-consensus-protocol/16514). You can learn more about Emily [here](https://ethresear.ch/t/pepc-dvt-pepc-with-no-changes-to-the-consensus-protocol/16514#emily-a-protocol-for-credible-commitments-14).
