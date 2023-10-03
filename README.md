@@ -105,10 +105,10 @@ sequenceDiagram
 						end
 		option Payload satisfies all commitments
 				CommitmentManager->>OP-Node: return true
-				OP-Node-->>OP-Node: continue processing payload
+				OP-Node-->OP-Node: continue processing payload
 		option Payload doesn't satisfy a commitment
 				CommitmentManager->>OP-Node: return false
-				OP-Node-->>OP-Node: reject payload
+				OP-Node-->OP-Node: reject payload
 		end
 ```
 
