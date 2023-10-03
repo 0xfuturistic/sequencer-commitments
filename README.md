@@ -85,7 +85,32 @@ contract Screener {
 ```
 It's also worth noting that even though they are constrained in their behavior by their commitments, a sequencer may choose not to provide their signature in the first place. So the sequencer can't be forced to act in a particular way. Rather, we prevent them from doing so in specific ways (i.e., in ways that violate their commitments).
 
-![Alt text](swimlanes.png)
+```mermaid
+sequenceDiagram
+		participant Network
+		participant OP-Node
+		participant L1 SystemConfig
+		participant CommitmentManager
+
+		Network-)OP-Node: OnUnsafeL2Payload
+		note right of Network: A new payload is received
+		critical Validate payload satisfies all commitments
+				note over L1 SystemConfig: inherits from Screener
+				OP-Node->>L1 SystemConfig: screen
+				note right of OP-Node: target is a series of bytes <br> identifying rollup
+						L1 SystemConfig->>CommitmentManager: areAccountCommitmmentsSatisfiedByValue
+						CommitmentManager->CommitmentManager: get sequencer's commitments for target
+						loop For each commitment
+								CommitmentManager-->CommitmentManager: check commitment is satisfied
+						end
+		option Payload satisfies all commitments
+				CommitmentManager->>OP-Node: return true
+				OP-Node-->>OP-Node: continue processing payload
+		option Payload doesn't satisfy a commitment
+				CommitmentManager->>OP-Node: return false
+				OP-Node-->>OP-Node: reject payload
+		end
+```
 
 ## 🗺 Road Ahead
 - Expand the variety of commitments provided as a sample.
